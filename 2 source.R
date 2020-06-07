@@ -63,6 +63,12 @@ allAccounts$LastName <- tolower(allAccounts$LastName)
 allAccounts$FullName <- paste(allAccounts$FirstName, allAccounts$LastName, sep = " ")
 allAccounts$MatchID <- NA
 rm(query)
+
+#####| ITO RUN |########
+#allAccounts <- allAccounts[allAccounts$CustomerID %in% ito$CustomerID, ]
+#rm(ito)
+########################
+
 cat(
   paste(
     nrow(allAccounts), " accounts read.", "\n",
@@ -155,7 +161,7 @@ while (i <= nrow(allAccounts)){
       # Assign CustomerID to MatchID if no close name matches are returned #
       allAccounts$MatchID[allAccounts$CustomerID %in% searchTemp$CustomerID] <- allAccounts$CustomerID[i]
     }
-    rm(searchTemp, searchSet)
+    rm(searchTemp)
     gc()
   }
   # Update progress bar #
@@ -185,15 +191,15 @@ output <- paste0(
   "---------------------", "\n",
   "Started: ", fullStart, "\n",
   "Finished: ", fullEnd, "\n",
-  "  Total time: ",seconds_to_period(fullTotal), "\n",
+  "  Total time: ", seconds_to_period(fullTotal), "\n",
   "\n",
   "High Level Results", "\n",
   "------------------", "\n",
   "All Accounts (", nrow(allAccounts), ")", "\n",
-  "  Duplicate accounts: ", sum(duplicated(allAccounts$MatchID[!is.na(allAccounts$MatchID)])), " (",
-      round((sum(duplicated(allAccounts$MatchID[!is.na(allAccounts$MatchID)])) / nrow(allAccounts)) * 100, 1), "%)", "\n",
+  "  Duplicate accounts: ", nrow(duped), " (",
+      round((nrow(duped) / nrow(allAccounts)) * 100, 1), "%)", "\n",
   "  Unique accounts: ", sum(!duplicated(allAccounts$MatchID[!is.na(allAccounts$MatchID)])), " (",
-      round((sum(!duplicated(allAccounts$MatchID[!is.na(allAccounts$MatchID)])) / nrow(allAccounts)) * 100, 1), "%)", "\n",
+      round((nrow(allAccounts[!(allAccounts$CustomerID %in% duped$CustomerID), ]) / nrow(allAccounts)) * 100, 1), "%)", "\n",
   "\n",
   "Parameters and Scoring Weights Used", "\n",
   "-----------------------------------", "\n",
@@ -221,7 +227,7 @@ cat(output)
 toWrite <- c("output", "allAccounts", "duped")
 for (j in toWrite){
   write.csv(get(j),
-            paste0("Output/", as.Date(fullStart), " ",hour(fullStart), ".", minute(fullStart), " ", j, ".csv"),
+            paste0("Output/", as.Date(fullStart), " ",hour(fullStart), ".", minute(fullStart), " ", j, "-ITO.csv"),
             quote = TRUE,
             row.names = FALSE,
             na = "")
