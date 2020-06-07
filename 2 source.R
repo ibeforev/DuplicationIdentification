@@ -227,7 +227,7 @@ cat(output)
 toWrite <- c("output", "allAccounts", "duped")
 for (j in toWrite){
   write.csv(get(j),
-            paste0("Output/", as.Date(fullStart), " ",hour(fullStart), ".", minute(fullStart), " ", j, "-ITO.csv"),
+            paste0("Output/", as.Date(fullStart), " ",hour(fullStart), ".", minute(fullStart), " ", j, ".csv"),
             quote = TRUE,
             row.names = FALSE,
             na = "")
